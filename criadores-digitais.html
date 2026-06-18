@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criadores Digitais — Jogo da Apresentação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #08080f;
+      --surface: #11111c;
+      --surf2:   #1a1a28;
+      --border:  #252535;
+      --text:    #e6e6f4;
+      --muted:   #7a7a98;
+      --ui:  'Space Grotesk', system-ui, sans-serif;
+      --mono:'JetBrains Mono','Fira Code',monospace;
+      --r:   12px;
+      --r-s:  8px;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; animation: fadeUp .25s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══ LANDING ════════════════════════════════════════════════ */
+    .l-header {
+      text-align: center;
+      padding: 4.5rem 2rem 1.5rem;
+      position: relative;
+    }
+    .l-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, #ffffff09 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.45) 0%, transparent 80%);
+    }
+    .l-eye {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .74rem;
+      color: var(--muted);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .l-eye em { color: #5dde8c; font-style: normal; }
+    .l-title {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 700;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+      margin-bottom: .7rem;
+      position: relative;
+    }
+    .l-title .grad {
+      background: linear-gradient(120deg, #5dde8c 10%, #3ab0ff 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .l-sub  { font-size: 1rem; color: var(--muted); max-width: 400px; margin: 0 auto .8rem; position: relative; }
+    .l-prof { font-family: 'JetBrains Mono', monospace; font-size: .76rem; color: var(--muted); position: relative; }
+    .l-prof strong { color: var(--text); }
+
+    .s-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.1rem;
+      padding: 2.5rem 2rem 1rem;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .card {
+      --cc: #555;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: var(--cc);
+      box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 0 0 1px var(--cc);
+    }
+    .card.ghost { opacity: .42; cursor: default; }
+    .card.ghost:hover { transform: none; box-shadow: none; border-color: var(--border); }
+
+    .c-top {
+      background: var(--cc);
+      padding: .42rem .8rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .c-dots { display: flex; gap: 5px; }
+    .c-dots span { width: 10px; height: 10px; border-radius: 50%; background: rgba(0,0,0,.28); }
+    .c-path { font-family: 'JetBrains Mono', monospace; font-size: .66rem; color: rgba(255,255,255,.62); margin-left: auto; }
+
+    .c-body { padding: 1.15rem 1.15rem 1.05rem; }
+    .c-nome  { font-size: 1.04rem; font-weight: 600; line-height: 1.25; margin-bottom: .22rem; }
+    .c-serie { font-family: 'JetBrains Mono', monospace; font-size: .71rem; color: var(--muted); margin-bottom: .85rem; }
+    .c-cor   { display: flex; align-items: center; gap: .38rem; font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--muted); margin-bottom: .85rem; }
+    .c-dot   { width: 9px; height: 9px; border-radius: 50%; background: var(--cc); flex-shrink: 0; }
+    .c-cta   { font-family: 'JetBrains Mono', monospace; font-size: .76rem; font-weight: 500; color: var(--cc); }
+    .c-soon  { font-family: 'JetBrains Mono', monospace; font-size: .73rem; color: var(--muted); }
+
+    .l-foot {
+      text-align: center;
+      padding: 2rem 2rem 3rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .73rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 1.5rem;
+    }
+
+    /* ══ PÁGINA ESTUDANTE ═══════════════════════════════════════ */
+    .s-hero {
+      background: var(--sc, #555);
+      padding: 2.8rem 2rem 2.5rem;
+    }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .74rem;
+      color: rgba(255,255,255,.72);
+      background: rgba(0,0,0,.2);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      padding: .33rem .9rem;
+      cursor: pointer;
+      margin-bottom: 1.8rem;
+      transition: background .15s;
+      font-weight: 500;
+    }
+    .btn-back:hover { background: rgba(0,0,0,.36); color: #fff; }
+    .s-nome { font-size: clamp(1.8rem, 4.5vw, 3rem); font-weight: 700; color: #fff; line-height: 1.08; letter-spacing: -.025em; margin-bottom: .4rem; }
+    .s-meta { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: rgba(255,255,255,.68); }
+
+    .s-content { max-width: 820px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+    .sec-label { font-family: 'JetBrains Mono', monospace; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
+    .sec-title { font-size: 1.3rem; font-weight: 600; color: var(--text); margin-bottom: 1.2rem; }
+    .divider   { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+    /* ══ TERMINAL INTERATIVO ════════════════════════════════════ */
+    .term-wrap {
+      background: #0c0c18;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .86rem;
+    }
+    .term-bar {
+      padding: .46rem .85rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .t-dots { display: flex; gap: 5px; }
+    .t-dot  { width: 10px; height: 10px; border-radius: 50%; }
+    .t-file { font-size: .68rem; color: rgba(255,255,255,.6); margin-left: .15rem; }
+    .btn-restart {
+      margin-left: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem;
+      color: rgba(255,255,255,.65);
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 999px;
+      padding: .22rem .65rem;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-restart:hover { background: rgba(0,0,0,.4); color: #fff; }
+
+    .term-body {
+      padding: 1.15rem 1.35rem 1.35rem;
+      min-height: 260px;
+      max-height: 500px;
+      overflow-y: auto;
+      line-height: 1.7;
+      scrollbar-width: thin;
+      scrollbar-color: #2a2a3e transparent;
+    }
+    .term-body::-webkit-scrollbar { width: 5px; }
+    .term-body::-webkit-scrollbar-track { background: transparent; }
+    .term-body::-webkit-scrollbar-thumb { background: #2a2a3e; border-radius: 99px; }
+
+    .t-sys  { color: #546e7a; font-size: .76rem; margin-bottom: .6rem; }
+    .t-out  { color: #c8dde8; white-space: pre-wrap; }
+    .t-err  { color: #ef9a9a; }
+    .t-blank { height: .45rem; }
+
+    .t-in-row {
+      display: flex;
+      align-items: baseline;
+      gap: .3rem;
+      flex-wrap: wrap;
+      margin-top: .05rem;
+    }
+    .t-prompt { color: #82aaff; white-space: nowrap; }
+    .t-typed  { color: #c3e88d; }
+
+    .t-field-wrap {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      flex: 1;
+    }
+    .t-field {
+      background: transparent;
+      border: none;
+      border-bottom: 1.5px solid #4a5568;
+      color: #c3e88d;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .86rem;
+      outline: none;
+      flex: 1;
+      min-width: 80px;
+      max-width: 280px;
+      padding: .05rem .15rem .08rem;
+      transition: border-color .15s;
+      caret-color: #c3e88d;
+    }
+    .t-field:focus { border-bottom-color: #c3e88d; }
+    .t-field.err   { border-bottom-color: #ef9a9a; color: #ef9a9a; }
+
+    .t-send {
+      background: transparent;
+      border: 1px solid #4a5568;
+      color: #7a7a98;
+      border-radius: 4px;
+      padding: .1rem .42rem;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .72rem;
+      transition: border-color .15s, color .15s;
+      flex-shrink: 0;
+    }
+    .t-send:hover { border-color: #c3e88d; color: #c3e88d; }
+
+    .t-err-hint {
+      color: #ef9a9a;
+      font-size: .73rem;
+      margin-top: .1rem;
+      display: none;
+    }
+
+    .t-done {
+      margin-top: .8rem;
+      color: #546e7a;
+      font-size: .76rem;
+      text-align: center;
+      padding: .5rem;
+      border-top: 1px solid #1e1e2e;
+    }
+
+    /* ══ TOGGLE CÓDIGO ══════════════════════════════════════════ */
+    .btn-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: .42rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .76rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: .33rem .85rem;
+      cursor: pointer;
+      margin-top: 1.75rem;
+      transition: color .15s, border-color .15s;
+    }
+    .btn-toggle:hover { color: var(--text); border-color: var(--sc); }
+    .btn-toggle .arr { transition: transform .2s; }
+    .btn-toggle.open .arr { transform: rotate(90deg); }
+
+    .code-section { display: none; margin-top: 1.15rem; }
+    .code-section.visible { display: block; }
+
+    /* ══ JANELA DE CÓDIGO ═══════════════════════════════════════ */
+    .code-win {
+      background: #14141f;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+    .code-bar {
+      background: #1e1e2e;
+      padding: .5rem .9rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .cb-dots { display: flex; gap: 5px; }
+    .cb-dot  { width: 10px; height: 10px; border-radius: 50%; }
+    .cb-file { font-family: 'JetBrains Mono', monospace; font-size: .68rem; color: var(--muted); margin-left: .2rem; }
+    .code-win pre[class*="language-"] {
+      margin: 0 !important;
+      border-radius: 0 !important;
+      background: #14141f !important;
+      padding: 1.35rem 1.45rem !important;
+      overflow-x: auto;
+      font-size: .84rem;
+      line-height: 1.75;
+    }
+    .code-win code[class*="language-"] {
+      font-family: 'JetBrains Mono', monospace !important;
+    }
+
+    /* ══ PRISM OVERRIDES ════════════════════════════════════════ */
+    .token.keyword  { color: #c792ea !important; }
+    .token.builtin  { color: #82aaff !important; }
+    .token.string   { color: #c3e88d !important; }
+    .token.number   { color: #f78c6c !important; }
+    .token.operator { color: #89ddff !important; }
+    .token.comment  { color: #546e7a !important; font-style: italic; }
+    .token.function { color: #82aaff !important; }
+
+    /* ══ RESPONSIVO ════════════════════════════════════════════ */
+    @media (max-width: 600px) {
+      .l-header  { padding: 3rem 1.25rem 1rem; }
+      .s-grid    { padding: 1.5rem 1rem .5rem; gap: .85rem; }
+      .s-hero    { padding: 2rem 1.25rem 2rem; }
+      .s-content { padding: 1.75rem 1.25rem 3rem; }
+      .term-body { font-size: .8rem; padding: 1rem 1rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LANDING ════════════════════════════════════════════════ -->
+<div id="pg-landing" class="page active">
+  <header class="l-header">
+    <p class="l-eye">Colégio Santa Úrsula · <em>Programação e Robótica</em></p>
+    <h1 class="l-title"><span class="grad">Criadores Digitais</span></h1>
+    <p class="l-sub">Jogo da Apresentação — código Python interativo de cada estudante</p>
+    <p class="l-prof">Prof. <strong>Gabriel Ferreira</strong></p>
+  </header>
+  <main class="s-grid" id="s-grid"></main>
+  <footer class="l-foot">
+    Selecione um(a) estudante e teste o programa digitando suas respostas.
+  </footer>
+</div>
+
+<!-- ══ PÁGINA ESTUDANTE ═══════════════════════════════════════ -->
+<div id="pg-est" class="page">
+  <div id="s-inner"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script>
+/* ────────────────────────────────────────────────────────────
+   UTILITÁRIO: simula print() do Python
+   Junta os args com espaço (sep=' ') e divide por \n
+   Retorna array de linhas
+──────────────────────────────────────────────────────────── */
+function pyPrint(...args) {
+  return args.map(a => String(a)).join(' ').split('\n');
+}
+
+/* ────────────────────────────────────────────────────────────
+   DADOS DOS ESTUDANTES
+──────────────────────────────────────────────────────────── */
+const ESTUDANTES = [
+
+  /* ── João Miguel ─────────────────────────────────────── */
+  {
+    id: 'joao', nome: 'João Miguel Montanari de Sousa',
+    serie: '7.º Ano C', cor: '#27ae60', corNome: 'Verde', temCodigo: true,
+    programa: {
+      arquivo: 'jogo_joao.py',
+      cabecalho: pyPrint('Jogo da Apresentação \n --------------------'),
+      entradas: [
+        { prompt: 'Qual é o seu nome? ',           chave: 'nome' },
+        { prompt: 'Qual é a sua idade? ',           chave: 'idade',         tipo: 'int' },
+        { prompt: 'Em qual série você está? ',      chave: 'serie' },
+        { prompt: 'Qual é o seu filme favorito? ',  chave: 'filme_favorito' },
+        { prompt: 'Qual é a sua comida favorita? ', chave: 'comida_favorita' },
+      ],
+      rodar: (v) => {
+        const r = [];
+        r.push(...pyPrint('Suas informações são:', v.nome, '\n', v.idade, 'anos', '\n', v.serie, '\n', v.filme_favorito, '\n', v.comida_favorita));
+        r.push(...pyPrint('Minhas informações são:', 'João Miguel', '\n', 12, 'anos', '\n', '7.º C', '\n', 'Minions', '\n', 'Carne'));
+        if      (v.idade > 12) r.push('Você é mais velho(a)!');
+        else if (v.idade < 12) r.push('Você é mais novo(a)!');
+        else                   r.push('Temos a mesma idade!');
+        return r;
+      }
+    },
+    codigo: `print("Jogo da Apresentação \\n --------------------")
+
+nome            = input("Qual é o seu nome? ")
+idade           = int(input("Qual é a sua idade? "))
+serie           = input("Em qual série você está? ")
+filme_favorito  = input("Qual é o seu filme favorito? ")
+comida_favorita = input("Qual é a sua comida favorita? ")
+
+meu_nome            = "João Miguel"
+minha_idade         = 12
+minha_serie         = "7.º C"
+meu_filme_favorito  = "Minions"
+minha_comida_favorita = "Carne"
+
+print("Suas informações são:", nome, "\\n", idade, "anos",
+      "\\n", serie, "\\n", filme_favorito, "\\n", comida_favorita)
+print("Minhas informações são:", meu_nome, "\\n", minha_idade, "anos",
+      "\\n", minha_serie, "\\n", meu_filme_favorito, "\\n", minha_comida_favorita)
+
+if idade > minha_idade:
+    print("Você é mais velho(a)!")
+elif idade < minha_idade:
+    print("Você é mais novo(a)!")
+else:
+    print("Temos a mesma idade!")`
+  },
+
+  /* ── Arthur Eduardo ──────────────────────────────────── */
+  {
+    id: 'arthur', nome: 'Arthur Eduardo Grossi Thomaz',
+    serie: '8.º Ano', cor: '#e74c3c', corNome: 'Vermelho', temCodigo: true,
+    programa: {
+      arquivo: 'jogo_arthur.py',
+      cabecalho: pyPrint('Jogo da Apresentação \n -----------------------'),
+      entradas: [
+        { prompt: 'Qual é o seu nome? ',           chave: 'nome' },
+        { prompt: 'Qual é a sua idade? ',           chave: 'idade',        tipo: 'int' },
+        { prompt: 'Qual é o seu filme favorito? ',  chave: 'filme_favorito' },
+        { prompt: 'Qual é a sua série? ',           chave: 'serie' },
+        { prompt: 'Qual é a sua comida favorita? ', chave: 'comida' },
+      ],
+      rodar: (v) => {
+        const r = [];
+        r.push(...pyPrint('Suas informações são:', v.nome, '\n', v.idade, 'anos', '\n', v.serie, '\n', v.filme_favorito, '\n', v.comida));
+        r.push(...pyPrint('Minhas informações são:', 'Arthur', '\n', 13, 'anos', '\n', '8', '\n', 'Jurassic World e Homem-Aranha', '\n', 'Tudo'));
+        if      (v.idade > 13) r.push('Você é mais velho(a)!');
+        else if (v.idade < 13) r.push('Você é mais novo(a)!');
+        else                   r.push('Temos a mesma idade!');
+        if (v.filme_favorito === 'Jurassic World e Homem-Aranha') r.push('Temos o mesmo filme favorito!');
+        else r.push('Gostamos de filmes diferentes!');
+        if (v.serie === '8') r.push('Estamos na mesma série!');
+        else r.push('Não estamos na mesma série!');
+        return r;
+      }
+    },
+    codigo: `print("Jogo da Apresentação \\n -----------------------")
+
+nome          = input("Qual é o seu nome? ")
+idade         = int(input("Qual é a sua idade? "))
+filme_favorito = input("Qual é o seu filme favorito? ")
+serie         = input("Qual é a sua série? ")
+comida        = input("Qual é a sua comida favorita? ")
+
+mnome         = "Arthur"
+midade        = 13
+mfilme_favorito = "Jurassic World e Homem-Aranha"
+mserie        = "8"
+mcomida       = "Tudo"
+
+print("Suas informações são:", nome, "\\n", idade, "anos",
+      "\\n", serie, "\\n", filme_favorito, "\\n", comida)
+print("Minhas informações são:", mnome, "\\n", midade, "anos",
+      "\\n", mserie, "\\n", mfilme_favorito, "\\n", mcomida)
+
+if idade > midade:
+    print("Você é mais velho(a)!")
+elif idade < midade:
+    print("Você é mais novo(a)!")
+else:
+    print("Temos a mesma idade!")
+
+if filme_favorito == mfilme_favorito:
+    print("Temos o mesmo filme favorito!")
+else:
+    print("Gostamos de filmes diferentes!")
+
+if serie == mserie:
+    print("Estamos na mesma série!")
+else:
+    print("Não estamos na mesma série!")`
+  },
+
+  /* ── Rafael Salvarani ────────────────────────────────── */
+  {
+    id: 'rafael', nome: 'Rafael Salvarani Lapa',
+    serie: '8.º Ano', cor: '#16a085', corNome: 'Verde', temCodigo: true,
+    programa: {
+      arquivo: 'jogo_rafael.py',
+      cabecalho: pyPrint('Jogo da Apresentação\n --------------------------------------------------------------'),
+      entradas: [
+        { prompt: 'Qual é o seu nome? ',           chave: 'nome' },
+        { prompt: 'Qual é a sua idade? ',           chave: 'idade',        tipo: 'int' },
+        { prompt: 'Qual é a sua série? ',           chave: 'serie' },
+        { prompt: 'Qual é o seu filme favorito? ',  chave: 'filme_favorito' },
+        { prompt: 'Qual é a sua comida favorita? ', chave: 'comida' },
+      ],
+      rodar: (v) => {
+        const r = [];
+        r.push(...pyPrint('As suas informações são:\n', v.nome, '\n', v.idade, 'anos', '\n', v.serie, '\n', v.filme_favorito, '\n', v.comida));
+        r.push(...pyPrint('As minhas informações são:\n', 'Rafael', '\n', 12, 'anos', '\n', 'Oitavo ano', '\n', 'Interestelar', '\n', 'Tilápia empanada'));
+        if      (v.idade > 12) r.push('Você é mais velho(a) que eu!');
+        else if (v.idade < 12) r.push('Você é mais novo(a) que eu!');
+        else                   r.push('Temos a mesma idade!');
+        return r;
+      }
+    },
+    codigo: `print("Jogo da Apresentação\\n --------------------------------------------------------------")
+
+nome          = input("Qual é o seu nome? ")
+idade         = int(input("Qual é a sua idade? "))
+serie         = input("Qual é a sua série? ")
+filme_favorito = input("Qual é o seu filme favorito? ")
+comida        = input("Qual é a sua comida favorita? ")
+
+mnome          = "Rafael"
+midade         = 12
+mserie         = "Oitavo ano"
+mfilme_favorito = "Interestelar"
+mcomida        = "Tilápia empanada"
+
+print("As suas informações são:\\n", nome, "\\n", idade, "anos",
+      "\\n", serie, "\\n", filme_favorito, "\\n", comida)
+print("As minhas informações são:\\n", mnome, "\\n", midade, "anos",
+      "\\n", mserie, "\\n", mfilme_favorito, "\\n", mcomida)
+
+if idade > midade:
+    print("Você é mais velho(a) que eu!")
+elif idade < midade:
+    print("Você é mais novo(a) que eu!")
+else:
+    print("Temos a mesma idade!")`
+  },
+
+  /* ── Helena Pelegrin ─────────────────────────────────── */
+  {
+    id: 'helena', nome: 'Helena Pelegrin Boldo',
+    serie: '7.º Ano C', cor: '#8e44ad', corNome: 'Lilás', temCodigo: true,
+    programa: {
+      arquivo: 'jogo_helena.py',
+      cabecalho: pyPrint('Jogo da Apresentação \n -'),
+      entradas: [
+        { prompt: 'Qual é o seu nome? ',           chave: 'nome' },
+        { prompt: 'Qual é a sua idade? ',           chave: 'idade',        tipo: 'int' },
+        { prompt: 'Qual é a sua série? ',           chave: 'serie' },
+        { prompt: 'Qual é o seu filme favorito? ',  chave: 'filme_favorito' },
+        { prompt: 'Qual é a sua comida favorita? ', chave: 'comida' },
+      ],
+      rodar: (v) => {
+        const r = [];
+        r.push(...pyPrint('Suas informações são:', v.nome, '\n', v.idade, 'anos', '\n', v.serie, '\n', v.filme_favorito, '\n', v.comida));
+        r.push(...pyPrint('Minhas informações são:', 'Helena', '\n', 12, 'anos', '\n', '7.º Ano C', '\n', 'Lilo e Stitch', '\n', 'Comida Japonesa'));
+        if      (v.idade > 12) r.push('Você é mais velho(a)!');
+        else if (v.idade < 12) r.push('Você é mais novo(a)!');
+        else                   r.push('Temos a mesma idade!');
+        if (v.serie === '7.º Ano C' || v.serie.toLowerCase().includes('7')) r.push('Estamos na mesma série!');
+        else r.push('Estamos em séries diferentes!');
+        return r;
+      }
+    },
+    codigo: `print("Jogo da Apresentação \\n -")
+
+nome          = input("Qual é o seu nome? ")
+idade         = int(input("Qual é a sua idade? "))
+serie         = input("Qual é a sua série? ")
+filme_favorito = input("Qual é o seu filme favorito? ")
+comida        = input("Qual é a sua comida favorita? ")
+
+mnome          = "Helena"
+midade         = 12
+mserie         = "7.º Ano C"
+mfilme_favorito = "Lilo e Stitch"
+mcomida        = "Comida Japonesa"
+
+print("Suas informações são:", nome, "\\n", idade, "anos",
+      "\\n", serie, "\\n", filme_favorito, "\\n", comida)
+print("Minhas informações são:", mnome, "\\n", midade, "anos",
+      "\\n", mserie, "\\n", mfilme_favorito, "\\n", mcomida)
+
+if idade > midade:
+    print("Você é mais velho(a)!")
+elif idade < midade:
+    print("Você é mais novo(a)!")
+else:
+    print("Temos a mesma idade!")
+
+if serie == mserie:
+    print("Estamos na mesma série!")
+else:
+    print("Estamos em séries diferentes!")`
+  },
+
+  /* ── Samuel Machado ──────────────────────────────────── */
+  {
+    id: 'samuel', nome: 'Samuel Machado Gasparin',
+    serie: '8.º Ano', cor: '#6c3483', corNome: 'Roxo', temCodigo: true,
+    programa: {
+      arquivo: 'jogo_samuel.py',
+      cabecalho: pyPrint('Jogo da Apresentação \n -----------------------------------------------------------------------'),
+      entradas: [
+        { prompt: 'Qual é o seu nome? ',           chave: 'nome' },
+        { prompt: 'Quantos anos você tem? ',        chave: 'idade',        tipo: 'int' },
+        { prompt: 'Qual é a sua série? ',           chave: 'serie' },
+        { prompt: 'Qual é o seu filme favorito? ',  chave: 'filme_favorito' },
+        { prompt: 'Qual é a sua comida favorita? ', chave: 'comida' },
+      ],
+      rodar: (v) => {
+        const r = [];
+        r.push(...pyPrint('Suas informações são:', v.nome, '\n', v.idade, 'anos', '\n', v.serie, '\n', v.filme_favorito, '\n', v.comida));
+        r.push(...pyPrint('Minhas informações são:', 'Samuel', '\n', 13, 'anos', '\n', 'Oitavo ano', '\n', 'Jujutsu Kaisen 0', '\n', 'Batata frita'));
+        if      (v.idade > 13) r.push('Você é mais velho(a)!');
+        else if (v.idade < 13) r.push('Você é mais novo(a)!');
+        else                   r.push('Nós temos a mesma idade!');
+        if (v.comida.toLowerCase() === 'batata frita') r.push('Gostamos da mesma comida!');
+        else r.push('Não gostamos da mesma comida!');
+        if (v.nome === 'Samuel') r.push('Nossos nomes são os mesmos!');
+        else r.push('Nossos nomes são diferentes!');
+        if (v.serie.toLowerCase().includes('oitavo') || v.serie === '8') r.push('Nossas séries são as mesmas!');
+        else r.push('Nossas séries são diferentes!');
+        if (v.filme_favorito === 'Jujutsu Kaisen 0') r.push('Nossos filmes favoritos são os mesmos!');
+        else r.push('Nossos filmes favoritos são diferentes!');
+        return r;
+      }
+    },
+    codigo: `print("Jogo da Apresentação \\n -----------------------------------------------------------------------")
+
+nome          = input("Qual é o seu nome? ")
+idade         = int(input("Quantos anos você tem? "))
+serie         = input("Qual é a sua série? ")
+filme_favorito = input("Qual é o seu filme favorito? ")
+comida        = input("Qual é a sua comida favorita? ")
+
+mnome          = "Samuel"
+midade         = 13
+mserie         = "Oitavo ano"
+mfilme_favorito = "Jujutsu Kaisen 0"
+mcomida        = "Batata frita"
+
+print("Suas informações são:", nome, "\\n", idade, "anos",
+      "\\n", serie, "\\n", filme_favorito, "\\n", comida)
+print("Minhas informações são:", mnome, "\\n", midade, "anos",
+      "\\n", mserie, "\\n", mfilme_favorito, "\\n", mcomida)
+
+if idade > midade:
+    print("Você é mais velho(a)!")
+elif idade < midade:
+    print("Você é mais novo(a)!")
+else:
+    print("Nós temos a mesma idade!")
+
+if comida == mcomida:
+    print("Gostamos da mesma comida!")
+else:
+    print("Não gostamos da mesma comida!")
+
+if nome == mnome:
+    print("Nossos nomes são os mesmos!")
+else:
+    print("Nossos nomes são diferentes!")
+
+if serie == mserie:
+    print("Nossas séries são as mesmas!")
+else:
+    print("Nossas séries são diferentes!")
+
+if filme_favorito == mfilme_favorito:
+    print("Nossos filmes favoritos são os mesmos!")
+else:
+    print("Nossos filmes favoritos são diferentes!")`
+  },
+
+  /* ── Lucas Machado ───────────────────────────────────── */
+  {
+    id: 'lucas', nome: 'Lucas Machado Gasparin',
+    serie: '8.º Ano', cor: '#c0392b', corNome: 'Vermelho', temCodigo: true,
+    programa: {
+      arquivo: 'jogo_lucas.py',
+      cabecalho: pyPrint('Jogo da Apresentação\n---------------------------------------------------------------'),
+      entradas: [
+        { prompt: 'Qual é o seu nome? ',           chave: 'nome' },
+        { prompt: 'Qual é a sua idade? ',           chave: 'idade', tipo: 'int' },
+        { prompt: 'Qual é a sua série? ',           chave: 'serie' },
+        { prompt: 'Qual é o seu filme favorito? ',  chave: 'filme' },
+        { prompt: 'Qual é a sua comida favorita? ', chave: 'comida' },
+      ],
+      rodar: (v) => {
+        const r = [];
+        r.push(...pyPrint('Suas informações são:', v.nome, '\n', v.idade, 'anos', '\n', v.serie, '\n', v.filme, '\n', v.comida));
+        r.push(...pyPrint('Minhas informações são:', 'Lucas', '\n', 13, 'anos', '\n', 'Oitavo ano', '\n', 'Jujutsu Kaisen 0', '\n', 'Coxinha de frango'));
+        if      (v.idade > 13) r.push('Você é mais velho(a)!');
+        else if (v.idade < 13) r.push('Eu sou mais velho!');
+        else                   r.push('Temos a mesma idade!');
+        return r;
+      }
+    },
+    codigo: `print("Jogo da Apresentação\\n---------------------------------------------------------------")
+
+nome  = input("Qual é o seu nome? ")
+idade = int(input("Qual é a sua idade? "))
+serie = input("Qual é a sua série? ")
+filme = input("Qual é o seu filme favorito? ")
+comida = input("Qual é a sua comida favorita? ")
+
+mnome  = "Lucas"
+midade = 13
+mserie = "Oitavo ano"
+mfilme = "Jujutsu Kaisen 0"
+mcomida = "Coxinha de frango"
+
+print("Suas informações são:", nome, "\\n", idade, "anos",
+      "\\n", serie, "\\n", filme, "\\n", comida)
+print("Minhas informações são:", mnome, "\\n", midade, "anos",
+      "\\n", mserie, "\\n", mfilme, "\\n", mcomida)
+
+if idade > midade:
+    print("Você é mais velho(a)!")
+elif idade < midade:
+    print("Eu sou mais velho!")
+else:
+    print("Temos a mesma idade!")`
+  },
+
+  /* ── Davi Velke ──────────────────────────────────────── */
+  {
+    id: 'davi', nome: 'Davi Velke Estevão Marques',
+    serie: '8.º Ano', cor: '#455a64', corNome: 'Preto', temCodigo: true,
+    programa: {
+      arquivo: 'jogo_davi.py',
+      cabecalho: pyPrint('Jogo da Apresentação \n--------------------------------------------------------'),
+      entradas: [
+        { prompt: 'Qual é o seu nome? ',           chave: 'nome' },
+        { prompt: 'Qual é a sua idade? ',           chave: 'idade',        tipo: 'int' },
+        { prompt: 'Qual é a sua série? ',           chave: 'serie' },
+        { prompt: 'Qual é o seu filme favorito? ',  chave: 'filme_favorito' },
+        { prompt: 'Qual é a sua comida favorita? ', chave: 'comida' },
+      ],
+      rodar: (v) => {
+        const r = [];
+        r.push(...pyPrint('Suas informações são:', v.nome, '\n', v.idade, 'anos', '\n', v.serie, '\n', v.filme_favorito, '\n', v.comida));
+        r.push(...pyPrint('Minhas informações são:', 'Davi', '\n', 13, 'anos', '\n', 'Oitavo ano', '\n', 'Star Wars', '\n', 'Frango'));
+        if      (v.idade > 13) r.push('Você é mais velho(a)!');
+        else if (v.idade < 13) r.push('Você é mais novo(a)!');
+        else                   r.push('Temos a mesma idade!');
+        return r;
+      }
+    },
+    codigo: `print("Jogo da Apresentação \\n--------------------------------------------------------")
+
+nome          = input("Qual é o seu nome? ")
+idade         = int(input("Qual é a sua idade? "))
+serie         = input("Qual é a sua série? ")
+filme_favorito = input("Qual é o seu filme favorito? ")
+comida        = input("Qual é a sua comida favorita? ")
+
+mnome          = "Davi"
+midade         = 13
+mserie         = "Oitavo ano"
+mfilme_favorito = "Star Wars"
+mcomida        = "Frango"
+
+print("Suas informações são:", nome, "\\n", idade, "anos",
+      "\\n", serie, "\\n", filme_favorito, "\\n", comida)
+print("Minhas informações são:", mnome, "\\n", midade, "anos",
+      "\\n", mserie, "\\n", mfilme_favorito, "\\n", mcomida)
+
+if idade > midade:
+    print("Você é mais velho(a)!")
+elif idade < midade:
+    print("Você é mais novo(a)!")
+else:
+    print("Temos a mesma idade!")`
+  },
+
+  /* ── Sem código ──────────────────────────────────────── */
+  { id: 'guilherme', nome: 'Guilherme', serie: 'Criadores Digitais', cor: '#2c3e50', corNome: 'Preto', temCodigo: false },
+  { id: 'gabriel-cd', nome: 'Gabriel',  serie: 'Criadores Digitais', cor: '#2980b9', corNome: 'Azul',  temCodigo: false },
+];
+
+/* ────────────────────────────────────────────────────────────
+   NAVEGAÇÃO
+──────────────────────────────────────────────────────────── */
+function irPara(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+function voltar() { irPara('pg-landing'); }
+
+/* ────────────────────────────────────────────────────────────
+   RENDER LANDING
+──────────────────────────────────────────────────────────── */
+function renderLanding() {
+  document.getElementById('s-grid').innerHTML = ESTUDANTES.map(e => `
+    <div class="card ${e.temCodigo ? '' : 'ghost'}"
+         style="--cc:${e.cor}"
+         ${e.temCodigo ? `onclick="abrirEstudante('${e.id}')"` : ''}>
+      <div class="c-top">
+        <div class="c-dots"><span></span><span></span><span></span></div>
+        <span class="c-path">/estudantes/${e.id}</span>
+      </div>
+      <div class="c-body">
+        <div class="c-nome">${e.nome}</div>
+        <div class="c-serie">${e.serie}</div>
+        <div class="c-cor"><span class="c-dot"></span>${e.corNome}</div>
+        ${e.temCodigo
+          ? `<div class="c-cta">▶ Executar programa</div>`
+          : `<div class="c-soon">Código em breve</div>`}
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ────────────────────────────────────────────────────────────
+   TERMINAL — classe principal
+──────────────────────────────────────────────────────────── */
+class Terminal {
+  constructor(est, contentor) {
+    this.est      = est;
+    this.prog     = est.programa;
+    this.el       = contentor;
+    this.vars     = {};
+    this.step     = 0;
+    this.build();
+    this.iniciar();
+  }
+
+  build() {
+    const cor = this.est.cor;
+    this.el.innerHTML = `
+      <div class="term-wrap">
+        <div class="term-bar" style="background:${cor}">
+          <div class="t-dots">
+            <div class="t-dot" style="background:rgba(0,0,0,.3)"></div>
+            <div class="t-dot" style="background:rgba(0,0,0,.3)"></div>
+            <div class="t-dot" style="background:rgba(0,0,0,.3)"></div>
+          </div>
+          <span class="t-file">${this.prog.arquivo}</span>
+          <button class="btn-restart" onclick="termAtivo && termAtivo.reiniciar()">↺ Reiniciar</button>
+        </div>
+        <div class="term-body" id="tbody"></div>
+      </div>`;
+    this.body = this.el.querySelector('#tbody');
+  }
+
+  iniciar() {
+    this.vars = {};
+    this.step = 0;
+    this.body.innerHTML = '';
+    this.addSys(`$ python ${this.prog.arquivo}`);
+    // cabeçalho (primeiras linhas do print inicial)
+    this.prog.cabecalho.forEach(l => this.addOut(l));
+    this.proximaEntrada();
+  }
+
+  reiniciar() { this.iniciar(); }
+
+  addSys(txt) {
+    const d = document.createElement('div');
+    d.className = 't-sys'; d.textContent = txt;
+    this.body.appendChild(d); this.scroll();
+  }
+  addOut(txt) {
+    const d = document.createElement('div');
+    d.className = 't-out'; d.textContent = txt;
+    this.body.appendChild(d); this.scroll();
+  }
+  addBlank() {
+    const d = document.createElement('div');
+    d.className = 't-blank';
+    this.body.appendChild(d);
+  }
+
+  proximaEntrada() {
+    if (this.step >= this.prog.entradas.length) {
+      this.encerrar(); return;
+    }
+    const ent = this.prog.entradas[this.step];
+    const row = document.createElement('div');
+    row.className = 't-in-row';
+
+    const pLabel = document.createElement('span');
+    pLabel.className = 't-prompt';
+    pLabel.textContent = ent.prompt;
+
+    const wrap = document.createElement('span');
+    wrap.className = 't-field-wrap';
+
+    const field = document.createElement('input');
+    field.type = 'text';
+    field.className = 't-field';
+    field.autocomplete = 'off';
+    field.spellcheck = false;
+    if (ent.tipo === 'int') field.inputMode = 'numeric';
+
+    const btn = document.createElement('button');
+    btn.className = 't-send';
+    btn.textContent = '↵';
+
+    const hint = document.createElement('div');
+    hint.className = 't-err-hint';
+    hint.textContent = 'Digite apenas números inteiros.';
+
+    wrap.appendChild(field);
+    wrap.appendChild(btn);
+    row.appendChild(pLabel);
+    row.appendChild(wrap);
+    this.body.appendChild(row);
+    this.body.appendChild(hint);
+    this.scroll();
+    setTimeout(() => field.focus(), 50);
+
+    const submit = () => {
+      const val = field.value.trim();
+      if (!val) { field.classList.add('err'); setTimeout(() => field.classList.remove('err'), 600); return; }
+      if (ent.tipo === 'int') {
+        const n = parseInt(val, 10);
+        if (isNaN(n)) {
+          field.classList.add('err');
+          hint.style.display = 'block';
+          field.value = '';
+          field.focus();
+          return;
+        }
+        this.vars[ent.chave] = n;
+      } else {
+        this.vars[ent.chave] = val;
+      }
+      // Converte a linha para texto estático
+      hint.remove();
+      row.innerHTML = '';
+      const pl = document.createElement('span'); pl.className = 't-prompt'; pl.textContent = ent.prompt;
+      const tv = document.createElement('span'); tv.className = 't-typed';  tv.textContent = val;
+      row.appendChild(pl); row.appendChild(tv);
+      this.step++;
+      this.proximaEntrada();
+    };
+
+    field.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    btn.addEventListener('click', submit);
+  }
+
+  encerrar() {
+    this.addBlank();
+    const saida = this.prog.rodar(this.vars);
+    saida.forEach(l => this.addOut(l));
+    const done = document.createElement('div');
+    done.className = 't-done';
+    done.textContent = '─── Programa encerrado ───';
+    this.body.appendChild(done);
+    this.scroll();
+  }
+
+  scroll() { this.body.scrollTop = this.body.scrollHeight; }
+}
+
+/* ────────────────────────────────────────────────────────────
+   RENDER PÁGINA DO ESTUDANTE
+──────────────────────────────────────────────────────────── */
+let termAtivo = null;
+
+function abrirEstudante(id) {
+  const est = ESTUDANTES.find(e => e.id === id);
+  if (!est || !est.temCodigo) return;
+
+  const arq = est.programa.arquivo;
+
+  document.getElementById('s-inner').innerHTML = `
+    <div style="--sc:${est.cor}">
+      <div class="s-hero" style="background:${est.cor}">
+        <button class="btn-back" onclick="voltar()">← Voltar à turma</button>
+        <div class="s-nome">${est.nome}</div>
+        <div class="s-meta">${est.serie} · Cor favorita: ${est.corNome}</div>
+      </div>
+
+      <div class="s-content">
+        <p class="sec-label">Terminal interativo</p>
+        <h2 class="sec-title">Execute o Jogo da Apresentação</h2>
+
+        <div id="term-holder"></div>
+
+        <button class="btn-toggle" id="btn-toggle" onclick="alternarCodigo()">
+          <span class="arr">›</span> Ver o código Python
+        </button>
+
+        <div class="code-section" id="cod-section">
+          <div class="code-win">
+            <div class="code-bar">
+              <div class="cb-dots">
+                <div class="cb-dot" style="background:#ff5f56"></div>
+                <div class="cb-dot" style="background:#ffbd2e"></div>
+                <div class="cb-dot" style="background:#27c93f"></div>
+              </div>
+              <span class="cb-file">${arq}</span>
+            </div>
+            <pre><code class="language-python" id="cod-bloco"></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Terminal
+  termAtivo = new Terminal(est, document.getElementById('term-holder'));
+
+  // Código
+  const bloco = document.getElementById('cod-bloco');
+  bloco.textContent = est.codigo;
+  Prism.highlightElement(bloco);
+
+  irPara('pg-est');
+}
+
+function alternarCodigo() {
+  const sec = document.getElementById('cod-section');
+  const btn = document.getElementById('btn-toggle');
+  const aberto = sec.classList.toggle('visible');
+  btn.classList.toggle('open', aberto);
+  btn.querySelector('span').textContent = aberto ? '›' : '›';
+  btn.childNodes[1].textContent = aberto ? ' Ocultar o código Python' : ' Ver o código Python';
+}
+
+/* ── INIT ──────────────────────────────────────────────── */
+renderLanding();
+</script>
+</body>
+</html>
